@@ -24,10 +24,12 @@ export class StocksService {
     const result = [];
     for (const el of stocks) {
       const stock = await this.apiCheck(el.symbol);
-      el.actualValue = stock.regularMarketPrice;
-      el.actualTotal = el.actualValue * el.quantity;
-      el.total = el.value * el.quantity;
-      result.push(el);
+      const data = {
+        actualValue: stock.regularMarketPrice,
+        actualTotal: stock.regularMarketPrice * el.quantity,
+        total: el.value * el.quantity
+      };
+      result.push({...el, ...data});
     }
 
     return result;
@@ -48,7 +50,7 @@ export class StocksService {
   public async delete(id: string, user: string) {
     const result = await this.stocksModel.findOne({_id: id, userID: user})
     if (!result) {
-      throw new Error("User doenst have this Stock");
+      throw new Error('User doenst have this Stock');
     }
     return this.stocksModel.findByIdAndDelete(id);
   }

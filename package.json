@@ -35,7 +35,7 @@
     "@typegoose/typegoose": "^7.4.8",
     "class-validator": "^0.13.0",
     "moment": "^2.29.1",
-    "mongoose": "^5.11.11",
+    "mongoose": "5.10.18",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
