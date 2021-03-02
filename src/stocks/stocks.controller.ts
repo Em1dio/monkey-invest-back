@@ -28,16 +28,16 @@ export class StocksController {
   }
 
   @Post()
-  async create(
-    @Body() stockDto: CreateStockUserDto,
-    @Request() req,
-  ): Promise<any> {
+  async create(@Body() stockDto: CreateStockUserDto, @Request() req) {
     return this.stocksService.create(stockDto, req.user.username);
   }
 
-  @Delete()
-  async delete(@Body('id') id: string) {
-    return this.stocksService.delete(id);
+  @Delete(':id')
+  async delete(
+    @Param('id') id: string,
+    @Request() req
+    ) {
+    return this.stocksService.delete(id, req.user.username);
   }
 
   @Put()

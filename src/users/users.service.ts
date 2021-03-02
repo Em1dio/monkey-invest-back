@@ -21,10 +21,20 @@ export class UsersService {
     }
 
     // CREATE
-    public async create(userUserDto: CreateUserDTO) {
-        const created = new this.usersModel(userUserDto);
-        // COMENTARIO! 
-        return created.save();
+    public async create(userDto: CreateUserDTO) {
+        try {
+            if(!this.isEmailValid(userDto.username)) {
+                throw {}
+            }
+            const created = new this.usersModel(userDto);
+            return created.save();
+        } catch (error) {
+            
+        }
+    }
+
+    private isEmailValid(username: string) {
+        return this.usersModel.findOne({ username });
     }
 
     // DELETE

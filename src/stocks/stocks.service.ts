@@ -45,7 +45,11 @@ export class StocksService {
   }
 
   // DELETE
-  public async delete(id: string) {
+  public async delete(id: string, user: string) {
+    const result = await this.stocksModel.findOne({_id: id, userID: user})
+    if (!result) {
+      throw new Error("User doenst have this Stock");
+    }
     return this.stocksModel.findByIdAndDelete(id);
   }
 

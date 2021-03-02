@@ -1,11 +1,9 @@
 import {
-  arrayProp,
   buildSchema,
   getModelForClass,
-  prop,
+  prop
 } from '@typegoose/typegoose';
 import * as moment from 'moment';
-import { ObjectId } from 'mongoose';
 
 export class Users {
   @prop({ required: true })

@@ -1,3 +1,4 @@
+import { CryptocoinsModule } from './cryptocoins/cryptocoins.module';
 import { HttpModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -10,6 +11,7 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    CryptocoinsModule,
     UsersModule,
     StocksModule,
     ConfigModule.forRoot({
@@ -33,4 +35,4 @@ import { UsersModule } from './users/users.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
