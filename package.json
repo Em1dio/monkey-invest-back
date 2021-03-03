@@ -4,14 +4,15 @@
   "description": "Nest TypeScript starter repository",
   "license": "MIT",
   "scripts": {
-    "prebuild": "rimraf dist",
     "build": "tsc -p tsconfig.build.json",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "node dist/main.js",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start:dev": "nodemon",
+    "start:debug": "nodemon --config nodemon-debug.json",
     "start:prod": "node dist/main.js",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "prestart:prod": "rimraf dist && npm run build",
+    "postinstall": "npm run prestart:prod",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -20,7 +21,7 @@
     "heroku-postbuild": "npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "engines": {
-    "node": "12.16.1"
+    "node": "12.16.3"
   },
   "dependencies": {
     "@nestjs/common": "^6.11.8",

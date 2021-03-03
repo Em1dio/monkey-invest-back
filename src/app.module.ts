@@ -14,6 +14,7 @@ import { UsersModule } from './users/users.module';
     CryptocoinsModule,
     UsersModule,
     StocksModule,
+    AuthModule,
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true,
@@ -30,7 +31,6 @@ import { UsersModule } from './users/users.module';
       }),
       inject: [ConfigService],
     }),
-    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
