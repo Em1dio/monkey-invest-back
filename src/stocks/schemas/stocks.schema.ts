@@ -5,8 +5,6 @@ import {
   prop,
 } from '@typegoose/typegoose';
 import * as moment from 'moment';
-import { ObjectId } from 'mongoose';
-
 export class Stocks {
   @prop({ required: true })
   public symbol: string;
@@ -16,9 +14,9 @@ export class Stocks {
 
   @prop({ required: false, default: () => 1 })
   public quantity: number;
-  
+
   @prop({ required: true })
-  public userID: ObjectId;
+  public userID: string;
 
   @prop({ required: false, default: () => moment.utc().toDate() })
   public buyDate: Date;
