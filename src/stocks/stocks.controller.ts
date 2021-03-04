@@ -18,12 +18,17 @@ import { StocksService } from './stocks.service';
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
   @Get()
-  findAll(@Request() req) {
+  public findAll(@Request() req) {
     return this.stocksService.findAll(req.user.username);
   }
 
+  @Get('consolidated')
+  public consolidated(@Request() req) {
+    return this.stocksService.consolidated(req.user.username);
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string, @Request() req) {
+  public findOne(@Param('id') id: string, @Request() req) {
     return this.stocksService.findOne(id, req.user.username);
   }
 
@@ -33,15 +38,12 @@ export class StocksController {
   }
 
   @Delete(':id')
-  async delete(
-    @Param('id') id: string,
-    @Request() req
-    ) {
+  public async delete(@Param('id') id: string, @Request() req) {
     return this.stocksService.delete(id, req.user.username);
   }
 
   @Put()
-  async update(@Body() stockDto: UpdateStockUserDto) {
+  public async update(@Body() stockDto: UpdateStockUserDto) {
     return this.stocksService.update(stockDto);
   }
 }
