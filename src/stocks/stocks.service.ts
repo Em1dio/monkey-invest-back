@@ -27,16 +27,33 @@ export class StocksService {
       const data = {
         actualValue: stock.regularMarketPrice,
         actualTotal: stock.regularMarketPrice * el.quantity,
-        total: el.value * el.quantity
+        total: el.value * el.quantity,
       };
-      result.push({...el, ...data});
+      result.push({ ...el, ...data });
     }
 
     return result;
   }
 
   public async findOne(id: string, user: string) {
-    return this.stocksModel.findOne({ _id: id, userID: user }).exec();
+    return this.stocksModel.findOne({ _id: id, userID: user }).lean();
+  }
+
+  // CONSOLIDATED - #TASK-001
+  public async consolidated(user: string) {
+    const stocks = await this.stocksModel
+      .find({ userID: user }, { _id: 0, symbol: 1, quantity: 1, value: 1 })
+      .lean();
+
+    const result = { totalBefore: 0, totalActual: 0 };
+    for (const stock of stocks) {
+      const apiStock = await this.apiCheck(stock.symbol);
+      const actualValue = apiStock.regularMarketPrice;
+      result.totalBefore += stock.value * stock.quantity;
+      result.totalActual += actualValue * stock.quantity;
+    }
+
+    return result;
   }
 
   // CREATE
@@ -48,7 +65,7 @@ export class StocksService {
 
   // DELETE
   public async delete(id: string, user: string) {
-    const result = await this.stocksModel.findOne({_id: id, userID: user})
+    const result = await this.stocksModel.findOne({ _id: id, userID: user });
     if (!result) {
       throw new Error('User doenst have this Stock');
     }
