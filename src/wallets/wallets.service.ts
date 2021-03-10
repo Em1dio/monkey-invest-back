@@ -13,20 +13,32 @@ export class WalletsService {
 
   public async create(walletDto: CreateWalletDTO, username?: string) {
     try {
-        if(!walletDto.ownerUsername && username) {
-            walletDto.ownerUsername = username;
-        }
+      if (!walletDto.ownerUsername && username) {
+        walletDto.ownerUsername = username;
+      }
       const created = new this.walletsModel(walletDto);
       return created.save();
     } catch (error) {
-        throw new Error(error);
+      throw new Error(error);
     }
   }
-  
+
   public async find(username: string) {
-    const owner = await this.walletsModel.find({ ownerUsername: username });
+    const owner = await this.walletsModel.find({ ownerUsername: username }).lean();
     // const shared = await this.walletsModel.find({ sharedUsers: {$in: });
     return { ...owner };
   }
 
+  public async remove(id: string, username: string) {
+    // Deletar o q foi pedido
+    await this.walletsModel.findByIdAndDelete(id);
+
+    // Count das atuais contas
+    const existingWallets = await this.walletsModel.count({ownerUsername: username});
+
+    // caso nao exista, crie uma.
+    if (existingWallets === 0) {
+      this.create({name: 'wallet'}, username)
+    }
+  }
 }
