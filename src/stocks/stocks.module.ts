@@ -3,11 +3,13 @@ import { StocksController } from './stocks.controller';
 import { StocksService } from './stocks.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StocksFeatureProvider } from './schemas/stocks.schema';
+import { WalletsModule } from 'src/wallets/wallets.module';
 
 @Module({
   imports: [
     HttpModule,
-    MongooseModule.forFeature([StocksFeatureProvider])
+    WalletsModule,
+    MongooseModule.forFeature([StocksFeatureProvider]),
   ],
   controllers: [StocksController],
   providers: [StocksService],

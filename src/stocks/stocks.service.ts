@@ -8,20 +8,27 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { CreateStockUserDto, UpdateStockUserDto } from './dto';
 import { Stocks, StocksFeatureProvider } from './schemas/stocks.schema';
-
+import { WalletsService } from './../wallets/wallets.service';
 @Injectable()
 export class StocksService {
   constructor(
     private httpService: HttpService,
+    private walletsService: WalletsService,
     @InjectModel(StocksFeatureProvider.name)
     private readonly stocksModel: ReturnModelType<typeof Stocks>,
   ) {}
 
   // READ
-  public async findAll(user: string) {
-    const stocks = await this.stocksModel.find({ userID: user }).lean();
-
+  public async findAll(username: string, walletId: string) {
     const result = [];
+
+    const isValid = this.walletsService.validateWallet(walletId, username);
+    if (!isValid) {
+      return result;
+    }
+
+    const stocks = await this.stocksModel.find({ walletId }).lean();
+
     for (const el of stocks) {
       const stock = await this.apiCheck(el.symbol);
       const data = {

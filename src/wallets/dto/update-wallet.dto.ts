@@ -1,8 +1,12 @@
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
-export class CreateWalletDTO {
+export class UpdateWalletDTO {
   @IsString()
-  name: string;
+  id?: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
 
   @IsOptional()
   @IsString()

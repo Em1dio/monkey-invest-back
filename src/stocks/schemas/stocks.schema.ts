@@ -16,7 +16,7 @@ export class Stocks {
   public quantity: number;
 
   @prop({ required: true })
-  public userID: string;
+  public walletId: string;
 
   @prop({ required: false, default: () => moment.utc().toDate() })
   public buyDate: Date;
