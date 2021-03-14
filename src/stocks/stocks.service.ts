@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { CreateStockUserDto, UpdateStockUserDto } from './dto';
+import { CreateStockDto, UpdateStockUserDto } from './dto';
 import { Stocks, StocksFeatureProvider } from './schemas/stocks.schema';
 import { WalletsService } from './../wallets/wallets.service';
 @Injectable()
@@ -22,7 +22,10 @@ export class StocksService {
   public async findAll(username: string, walletId: string) {
     const result = [];
 
-    const isValid = this.walletsService.validateWallet(walletId, username);
+    const isValid = await this.walletsService.validateWallet(
+      walletId,
+      username,
+    );
     if (!isValid) {
       return result;
     }
@@ -47,9 +50,9 @@ export class StocksService {
   }
 
   // CONSOLIDATED - #TASK-001
-  public async consolidated(user: string) {
+  public async consolidated(walletId: string) {
     const stocks = await this.stocksModel
-      .find({ userID: user }, { _id: 0, symbol: 1, quantity: 1, value: 1 })
+      .find({ walletId }, { _id: 0, symbol: 1, quantity: 1, value: 1 })
       .lean();
 
     const result = { totalBefore: 0, totalActual: 0 };
@@ -64,8 +67,7 @@ export class StocksService {
   }
 
   // CREATE
-  public async create(stockUserDto: CreateStockUserDto, user: string) {
-    stockUserDto.userID = user;
+  public async create(stockUserDto: CreateStockDto) {
     const created = new this.stocksModel(stockUserDto);
     return created.save();
   }

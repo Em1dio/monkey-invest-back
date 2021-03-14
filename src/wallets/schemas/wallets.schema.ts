@@ -1,12 +1,12 @@
 import { buildSchema, getModelForClass, prop } from '@typegoose/typegoose';
 
-enum typeTransaction {
+export enum typeTransaction {
   ADD = 'add',
   SUB = 'sub',
   CANCELLED = "canceled",
   CUSTOM = 'custom',
 }
-enum statusTransaction {
+export enum statusTransaction {
   ACTIVE = 'active',
   CANCELLED = "canceled",
   DONE = 'done',

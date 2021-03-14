@@ -38,12 +38,12 @@ export class WalletsService {
   }
 
   public async validateWallet(walletId: string, username: string) {
-    const wallet = this.walletsModel.find({ _id: walletId }).exec();
+    const wallet = await this.walletsModel.findOne({ _id: walletId }).exec();
     if (wallet.isPublic) {
       return true;
     }
 
-    if (wallet.ownerUsername === username && username in wallet.sharedUsers) {
+    if (wallet.ownerUsername === username || username in wallet.sharedUsers) {
       return true;
     }
 
