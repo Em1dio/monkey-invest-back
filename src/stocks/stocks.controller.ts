@@ -8,37 +8,34 @@ import {
   Put,
   UseGuards,
   Request,
+  Headers,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { CreateStockUserDto, UpdateStockUserDto } from './dto';
+import { CreateStockDto, UpdateStockUserDto } from './dto';
 import { StocksService } from './stocks.service';
 
 @UseGuards(JwtAuthGuard)
 @Controller('stocks')
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
-  @Get()
-  public findAll(@Request() req) {
-    return this.stocksService.findAll(req.user.username);
+
+  @Get('consolidated/:walletId')
+  public consolidated(@Param('walletId') walletId: string) {
+    return this.stocksService.consolidated(walletId);
   }
 
-  @Get('consolidated')
-  public consolidated(@Request() req) {
-    return this.stocksService.consolidated(req.user.username);
-  }
-
-  @Get(':id')
-  public findOne(@Param('id') id: string, @Request() req) {
-    return this.stocksService.findOne(id, req.user.username);
+  @Get(':walletId')
+  public findAll(@Request() req, @Param('walletId') walletId: string) {
+    return this.stocksService.findAll(req.user.username, walletId);
   }
 
   @Post()
-  async create(@Body() stockDto: CreateStockUserDto, @Request() req) {
-    return this.stocksService.create(stockDto, req.user.username);
+  async create(@Body() stockDto: CreateStockDto) {
+    return this.stocksService.create(stockDto);
   }
 
   @Delete(':id')
-  public async delete(@Param('id') id: string, @Request() req) {
+  public async delete(@Request() req, @Param('id') id: string) {
     return this.stocksService.delete(id, req.user.username);
   }
 

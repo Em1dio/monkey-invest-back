@@ -1,3 +1,4 @@
+import { WalletsModule } from './wallets/wallets.module';
 import { CryptocoinsModule } from './cryptocoins/cryptocoins.module';
 import { HttpModule, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,6 +12,7 @@ import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
+    WalletsModule,
     CryptocoinsModule,
     UsersModule,
     StocksModule,

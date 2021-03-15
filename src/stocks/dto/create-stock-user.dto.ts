@@ -1,8 +1,9 @@
 import { IsBoolean, IsDate, IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
 
-export class CreateStockUserDto {
+export class CreateStockDto {
   value: number;
   symbol: string;
+  walletId: string;
   quantity?: number;
   buyDate?: Date;
   sellDate?: Date;
