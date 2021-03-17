@@ -1,4 +1,4 @@
-import { Module, HttpModule } from '@nestjs/common';
+import { Module, HttpModule, forwardRef } from '@nestjs/common';
 import { StocksController } from './stocks.controller';
 import { StocksService } from './stocks.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -8,10 +8,11 @@ import { WalletsModule } from 'src/wallets/wallets.module';
 @Module({
   imports: [
     HttpModule,
-    WalletsModule,
+    forwardRef(() => WalletsModule),
     MongooseModule.forFeature([StocksFeatureProvider]),
   ],
   controllers: [StocksController],
   providers: [StocksService],
+  exports: [StocksService],
 })
 export class StocksModule {}

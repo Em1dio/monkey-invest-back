@@ -1,18 +1,21 @@
 import {
+  forwardRef,
   HttpException,
   HttpService,
   HttpStatus,
+  Inject,
   Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { CreateStockDto, UpdateStockUserDto } from './dto';
+import { CreateStockDto, DeleteStockDto, UpdateStockUserDto } from './dto';
 import { Stocks, StocksFeatureProvider } from './schemas/stocks.schema';
 import { WalletsService } from './../wallets/wallets.service';
 @Injectable()
 export class StocksService {
   constructor(
     private httpService: HttpService,
+    @Inject(forwardRef(() => WalletsService))
     private walletsService: WalletsService,
     @InjectModel(StocksFeatureProvider.name)
     private readonly stocksModel: ReturnModelType<typeof Stocks>,
@@ -73,12 +76,23 @@ export class StocksService {
   }
 
   // DELETE
-  public async delete(id: string, user: string) {
-    const result = await this.stocksModel.findOne({ _id: id, userID: user });
+  public async delete(dto: DeleteStockDto, username: string) {
+    const isValid = await this.walletsService.validateWallet(
+      dto.walletId,
+      username,
+    );
+    if (!isValid) {
+      throw new Error('This user doenst have access to this Wallet');
+    }
+
+    const result = await this.stocksModel.findOne({
+      _id: dto.id,
+      walletId: dto.walletId,
+    });
     if (!result) {
       throw new Error('User doenst have this Stock');
     }
-    return this.stocksModel.findByIdAndDelete(id);
+    return this.stocksModel.findByIdAndDelete(dto.id);
   }
 
   // UPDATE
