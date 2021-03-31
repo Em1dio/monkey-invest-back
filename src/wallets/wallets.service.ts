@@ -34,7 +34,9 @@ export class WalletsService {
     // const shared = await this.walletsModel.find({ sharedUsers: {$in: });
     const result = [];
     for (const wallet of owner) {
-      const consolidated = await this.stocksService.consolidated(wallet._id.toString());
+      const consolidated = await this.stocksService.consolidated(
+        wallet._id.toString(),
+      );
       result.push({ ...wallet._doc, ...consolidated });
     }
     return { ...result };

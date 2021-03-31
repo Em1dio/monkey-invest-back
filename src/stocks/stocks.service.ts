@@ -55,14 +55,34 @@ export class StocksService {
   // CONSOLIDATED - #TASK-001
   public async consolidated(walletId: string) {
     const stocks = await this.stocksModel
-      .find({ walletId }, { _id: 0, symbol: 1, quantity: 1, value: 1 })
-      .lean();
+      .aggregate([
+        { $match: { walletId } },
+        {
+          $project: {
+            _id: 0,
+            symbol: 1,
+            quantity: 1,
+            total: { $multiply: ['$value', '$quantity'] },
+          },
+        },
+        {
+          $group: {
+            _id: '$symbol',
+            quantity: { $sum: '$quantity' },
+            total: { $sum: '$total' },
+          },
+        },
+      ])
+      .exec();
+
+    const symbols = stocks.map(x => x._id).join(',');
+    const apiStock = await this.apiCheck(symbols);
 
     const result = { totalBefore: 0, totalActual: 0 };
     for (const stock of stocks) {
-      const apiStock = await this.apiCheck(stock.symbol);
-      const actualValue = apiStock.regularMarketPrice;
-      result.totalBefore += stock.value * stock.quantity;
+      const actualValue = apiStock.find(x => x.symbol === stock._id)
+        .regularMarketPrice;
+      result.totalBefore += stock.total;
       result.totalActual += actualValue * stock.quantity;
     }
 
@@ -106,7 +126,7 @@ export class StocksService {
     const url = `https://brapi.ga/api/quote/${stock}`;
     try {
       const response = await this.httpService.get(url).toPromise();
-      return response.data.results[0];
+      return response.data.results;
     } catch (error) {
       throw new HttpException(
         'brapi doenst recognize this stock',
