@@ -15,8 +15,12 @@ export class CreateCryptoDto {
   @IsOptional()
   buyDate?: Date;
 
+  @IsOptional()
   @IsString()
-  userId: string;
+  userId?: string;
+
+  @IsString()
+  walletId: string;
 
   @IsBoolean()
   @IsOptional()

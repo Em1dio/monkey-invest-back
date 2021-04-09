@@ -16,7 +16,8 @@ export class CryptocoinsService {
   ) {}
 
   // CREATE
-  public async create(dto: CreateCryptoDto) {
+  public async create(dto: CreateCryptoDto, username: string) {
+    dto.userId = username;
     const created = new this.cryptoModel(dto);
     return created.save();
   }
@@ -39,9 +40,9 @@ export class CryptocoinsService {
     const result = await this.cryptoModel.findOne({
       _id: dto.id,
       walletId: dto.walletId,
-    });
+    }).lean();
     if (!result) {
-      throw new Error('User doenst have this Stock');
+      throw new Error('User doenst have this Crypto');
     }
     return this.cryptoModel.findByIdAndDelete(dto.id);
   }

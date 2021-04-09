@@ -18,6 +18,9 @@ export class Cryptos {
   @prop({ required: true })
   public walletId: string;
 
+  @prop({ required: true })
+  public userId: string;
+
   @prop({ required: false, default: () => moment.utc().toDate() })
   public buyDate: Date;
 

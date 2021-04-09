@@ -76,16 +76,17 @@ export class StocksService {
       .exec();
 
     const symbols = stocks.map(x => x._id).join(',');
-    const apiStock = await this.apiCheck(symbols);
-
     const result = { totalBefore: 0, totalActual: 0 };
-    for (const stock of stocks) {
-      const actualValue = apiStock.find(x => x.symbol === stock._id)
-        .regularMarketPrice;
-      result.totalBefore += stock.total;
-      result.totalActual += actualValue * stock.quantity;
-    }
+    if (symbols !== '') {
+      const apiStock = await this.apiCheck(symbols);
 
+      for (const stock of stocks) {
+        const actualValue = apiStock.find(x => x.symbol === stock._id)
+          .regularMarketPrice;
+        result.totalBefore += stock.total;
+        result.totalActual += actualValue * stock.quantity;
+      }
+    }
     return result;
   }
 
