@@ -1,6 +1,8 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
+import { promises } from 'dns';
+import { CryptocoinsService } from 'src/cryptocoins/cryptocoins.service';
 import { StocksService } from 'src/stocks/stocks.service';
 import { CreateWalletDTO } from './dto/create-wallet.dto';
 import { UpdateWalletDTO } from './dto/update-wallet.dto';
@@ -11,6 +13,7 @@ export class WalletsService {
   constructor(
     @Inject(forwardRef(() => StocksService))
     private stocksService: StocksService,
+    private cryptocoinsService: CryptocoinsService,
     @InjectModel(WalletsFeatureProvider.name)
     private readonly walletsModel: ReturnModelType<typeof Wallets>,
   ) {}
@@ -34,8 +37,9 @@ export class WalletsService {
     // const shared = await this.walletsModel.find({ sharedUsers: {$in: });
     const result = [];
     for (const wallet of owner) {
-      const consolidated = await this.stocksService.consolidated(wallet._id.toString());
-      result.push({ ...wallet._doc, ...consolidated });
+      const totals = await this.calculateTotals(wallet._id.toString());
+
+      result.push({ ...wallet._doc, ...totals });
     }
     return { ...result };
   }
@@ -87,5 +91,38 @@ export class WalletsService {
     } catch (error) {
       throw new Error(error);
     }
+  }
+
+  private async calculateTotals(walletId: string) {
+    // Solucao @MeChamoGeo
+    
+    // Caio vai nesse site (https://lodash.com/) e abre o inspect e cola no terminal kkkk
+
+    // var items = [
+    //   { 'lightBlue': 4, 'darkBlue': 2, 'red': 4, 'orange': 6, 'purple': 7 },
+    //   { 'lightBlue': 6, 'darkBlue': 5, 'red': 1, 'orange': 2, 'purple': 3 },
+    //   { 'lightBlue': 2, 'darkBlue': 4, 'red': 3, 'orange': 4, 'purple': 9 }
+    // ],
+
+    // userSelectedColors = ['lightBlue', 'darkBlue'];
+
+    // var totalCount = _.sumBy(userSelectedColors, _.partial(_.sumBy, items));
+
+    // console.log(totalCount);
+
+    const totals = { totalBefore: 0, totalActual: 0 };
+
+    const [stocksConsolidated, cryptoConsolidated] = await Promise.all([
+      this.stocksService.consolidated(walletId),
+      this.cryptocoinsService.consolidated(walletId),
+    ]);
+
+    totals.totalBefore += stocksConsolidated.totalBefore;
+    totals.totalActual += stocksConsolidated.totalActual;
+
+    totals.totalBefore += cryptoConsolidated.totalBefore;
+    totals.totalActual += cryptoConsolidated.totalActual;
+
+    return totals;
   }
 }
