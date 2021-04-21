@@ -34,9 +34,15 @@ export class StocksService {
     }
 
     const stocks = await this.stocksModel.find({ walletId }).lean();
+    const symbols = stocks.map(x => x.symbol).join(',');
+
+    if (symbols === '') {
+      return result;
+    }
+    const apiStock = await this.apiCheck(symbols);
 
     for (const el of stocks) {
-      const stock = await this.apiCheck(el.symbol);
+      const stock = apiStock.find(x => x.symbol === el.symbol);
       const data = {
         actualValue: stock.regularMarketPrice,
         actualTotal: stock.regularMarketPrice * el.quantity,
@@ -77,16 +83,19 @@ export class StocksService {
 
     const symbols = stocks.map(x => x._id).join(',');
     const result = { totalBefore: 0, totalActual: 0 };
-    if (symbols !== '') {
-      const apiStock = await this.apiCheck(symbols);
-
-      for (const stock of stocks) {
-        const actualValue = apiStock.find(x => x.symbol === stock._id)
-          .regularMarketPrice;
-        result.totalBefore += stock.total;
-        result.totalActual += actualValue * stock.quantity;
-      }
+    if (symbols === '') {
+      return result;
     }
+
+    const apiStock = await this.apiCheck(symbols);
+
+    for (const stock of stocks) {
+      const actualValue = apiStock.find(x => x.symbol === stock._id)
+        .regularMarketPrice;
+      result.totalBefore += stock.total;
+      result.totalActual += actualValue * stock.quantity;
+    }
+
     return result;
   }
 
