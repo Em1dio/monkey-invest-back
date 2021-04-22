@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
+import * as bcrypt from 'bcrypt';
 import { WalletsService } from 'src/wallets/wallets.service';
 import { CreateUserDTO, UpdateUserDTO } from './dto';
 import { Users, UsersFeatureProvider } from './schemas/users.schema';
@@ -28,8 +29,9 @@ export class UsersService {
       if (!this.isEmailValid(userDto.username)) {
         throw {};
       }
+      userDto.password = await bcrypt.hash(userDto.password, 10);
       const created = new this.usersModel(userDto);
-      this.walletsService.createWallet({name: 'Wallet'}, userDto.username)
+      this.walletsService.createWallet({ name: 'Wallet' }, userDto.username);
       return created.save();
     } catch (error) {}
   }
