@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import * as bcrypt from 'bcrypt';
@@ -27,7 +27,7 @@ export class UsersService {
   public async create(userDto: CreateUserDTO) {
     try {
       if (!this.isEmailValid(userDto.username)) {
-        throw {};
+        throw new HttpException('This email is not valid', HttpStatus.FORBIDDEN);
       }
       userDto.password = await bcrypt.hash(userDto.password, 10);
       const created = new this.usersModel(userDto);

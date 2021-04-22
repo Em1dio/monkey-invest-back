@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { promises } from 'dns';
@@ -26,7 +26,7 @@ export class WalletsService {
       const created = new this.walletsModel(walletDto);
       return created.save();
     } catch (error) {
-      throw new Error(error);
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
     }
   }
 
@@ -63,15 +63,12 @@ export class WalletsService {
   }
 
   public async remove(id: string, username: string) {
-    // Deletar o q foi pedido
     await this.walletsModel.findByIdAndDelete(id);
 
-    // Count das atuais contas
     const existingWallets = await this.walletsModel.count({
       ownerUsername: username,
     });
 
-    // caso nao exista, crie uma.
     if (existingWallets === 0) {
       this.createWallet({ name: 'wallet' }, username);
     }
@@ -89,27 +86,11 @@ export class WalletsService {
       const created = new this.walletsModel(walletDto);
       return created.save();
     } catch (error) {
-      throw new Error(error);
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
     }
   }
 
   private async calculateTotals(walletId: string) {
-    // Solucao @MeChamoGeo
-    
-    // Caio vai nesse site (https://lodash.com/) e abre o inspect e cola no terminal kkkk
-
-    // var items = [
-    //   { 'lightBlue': 4, 'darkBlue': 2, 'red': 4, 'orange': 6, 'purple': 7 },
-    //   { 'lightBlue': 6, 'darkBlue': 5, 'red': 1, 'orange': 2, 'purple': 3 },
-    //   { 'lightBlue': 2, 'darkBlue': 4, 'red': 3, 'orange': 4, 'purple': 9 }
-    // ],
-
-    // userSelectedColors = ['lightBlue', 'darkBlue'];
-
-    // var totalCount = _.sumBy(userSelectedColors, _.partial(_.sumBy, items));
-
-    // console.log(totalCount);
-
     const totals = { totalBefore: 0, totalActual: 0 };
 
     const [stocksConsolidated, cryptoConsolidated] = await Promise.all([

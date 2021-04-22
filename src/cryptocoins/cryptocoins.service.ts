@@ -103,7 +103,7 @@ export class CryptocoinsService {
       })
       .lean();
     if (!result) {
-      throw new Error('User doenst have this Crypto');
+      throw new HttpException('User doenst have this Crypto', HttpStatus.NOT_FOUND);
     }
     return this.cryptoModel.findByIdAndDelete(dto.id);
   }
@@ -115,7 +115,7 @@ export class CryptocoinsService {
       return response.data;
     } catch (error) {
       throw new HttpException(
-        'brapi doenst recognize this stock',
+        'awesomiApi doenst recognize this crypto',
         HttpStatus.EXPECTATION_FAILED,
       );
     }
