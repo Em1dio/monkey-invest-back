@@ -11,6 +11,7 @@ import {
   Headers,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { User } from 'src/users/decorators/Index.decorator';
 import { CreateStockDto, UpdateStockUserDto, DeleteStockDto } from './dto';
 import { StocksService } from './stocks.service';
 
@@ -25,8 +26,8 @@ export class StocksController {
   }
 
   @Get(':walletId')
-  public findAll(@Request() req, @Param('walletId') walletId: string) {
-    return this.stocksService.findAll(req.user.username, walletId);
+  public findAll(@User('username') username, @Param('walletId') walletId: string) {
+    return this.stocksService.findAll(username, walletId);
   }
 
   @Post()
@@ -35,8 +36,8 @@ export class StocksController {
   }
 
   @Delete(':walletId/:id')
-  public async delete(@Request() req, @Param() deleteDto: DeleteStockDto) {
-    return this.stocksService.delete(deleteDto, req.user.username);
+  public async delete(@User('username') username, @Param() deleteDto: DeleteStockDto) {
+    return this.stocksService.delete(deleteDto, username);
   }
 
   @Put()

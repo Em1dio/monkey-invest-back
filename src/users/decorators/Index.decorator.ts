@@ -1,8 +1,8 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { createParamDecorator } from '@nestjs/common';
 
 export const User = createParamDecorator(
-  (data: unknown, ctx) => {
-    const user = ctx.user;
+  (data: string, ctx) => {
+    const req = ctx;
 
     const {
       id,
@@ -12,9 +12,9 @@ export const User = createParamDecorator(
       active,
       createAt,
       telephone
-    } = user
+    } = req.user
 
-    return {
+    const user = {
       id,
       name,
       username,
@@ -23,5 +23,7 @@ export const User = createParamDecorator(
       createAt,
       telephone
     }
+
+    return data ? user?.[data] : user
   },
 );
