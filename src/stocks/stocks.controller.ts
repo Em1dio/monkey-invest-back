@@ -30,8 +30,11 @@ export class StocksController {
   }
 
   @Post()
-  async create(@Body() stockDto: CreateStockDto) {
-    return this.stocksService.create(stockDto);
+  async create(
+    @Request() req,
+    @Body() stockDto: CreateStockDto
+  ) {
+    return this.stocksService.create(stockDto, req.user.username);
   }
 
   @Delete(':walletId/:id')

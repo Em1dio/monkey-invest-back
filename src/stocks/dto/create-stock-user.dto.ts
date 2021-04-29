@@ -7,6 +7,7 @@ export class CreateStockDto {
   quantity?: number;
   buyDate?: Date;
   sellDate?: Date;
-  userID?: string;
+  userId: string;
   status?: boolean;
+  origin?: string;
 }

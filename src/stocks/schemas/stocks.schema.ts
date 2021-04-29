@@ -26,6 +26,9 @@ export class Stocks {
 
   @prop({ required: false, default: () => true })
   public status: boolean;
+
+  @prop({ required: true })
+  public userId: string;
 }
 
 const StockModel = getModelForClass(Stocks);

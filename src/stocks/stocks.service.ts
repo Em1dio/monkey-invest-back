@@ -100,7 +100,7 @@ export class StocksService {
   }
 
   // CREATE
-  public async create(stockUserDto: CreateStockDto) {
+  public async create(stockUserDto: CreateStockDto, username: string) {
     const isValidStock = await this.apiValidateStock(stockUserDto.symbol);
     if (!isValidStock) {
       throw new HttpException(
@@ -108,7 +108,7 @@ export class StocksService {
         HttpStatus.EXPECTATION_FAILED,
       );
     }
-
+    stockUserDto.userId = username;
     const created = new this.stocksModel(stockUserDto);
     return created.save();
   }
@@ -154,9 +154,6 @@ export class StocksService {
   }
 
   private async apiValidateStock(stock: string) {
-    if (stock.length !== 6) {
-      return false;
-    }
     const url = `https://brapi.ga/api/available?search=${stock}`;
     const response = await this.httpService.get(url).toPromise();
     return response.data.stocks.length === 1;
