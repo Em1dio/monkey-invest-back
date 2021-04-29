@@ -11,6 +11,7 @@ import {
   Headers,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { User } from 'src/users/decorators/Index.decorator';
 import { CryptocoinsService } from './cryptocoins.service';
 import { CreateCryptoDto } from './dto/create-crypto.dto';
 import { DeleteCryptoDto } from './dto/delete-crypto.dto';
@@ -31,8 +32,8 @@ export class CryptocoinsController {
   }
 
   @Post()
-  async create(@Request() req, @Body() dto: CreateCryptoDto) {
-    return this.cryptocoinsService.create(dto, req.user.username);
+  async create(@User('username') username, @Body() dto: CreateCryptoDto) {
+    return this.cryptocoinsService.create(dto, username);
   }
 
   @Delete(':walletId/:id')
