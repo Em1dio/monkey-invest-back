@@ -41,7 +41,7 @@ export class WalletsService {
 
       result.push({ ...wallet._doc, ...totals });
     }
-    return { ...result };
+    return result;
   }
 
   public async update(dto: UpdateWalletDTO) {
