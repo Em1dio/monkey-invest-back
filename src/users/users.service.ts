@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import * as bcrypt from 'bcrypt';
+import { doc } from 'prettier';
 import { WalletsService } from 'src/wallets/wallets.service';
 import { ChangePasswordDTO, CreateUserDTO, UpdateUserDTO } from './dto';
 import { Users, UsersFeatureProvider } from './schemas/users.schema';
@@ -27,9 +28,11 @@ export class UsersService {
     const comparePassword = await bcrypt.compare(dto.oldPassword, doc.password);
     if (comparePassword) {
       doc.password = await bcrypt.hash(dto.password, 10);
-      return this.usersModel.updateOne({ _id: doc._id }, doc).exec();
-     }
-     throw new BadRequestException('Incorrect Password');
+      await this.usersModel.updateOne({ _id: doc._id }, doc).exec();
+      delete doc.password;
+      return doc;
+    }
+    throw new BadRequestException('Incorrect Password');
   }
 
   public async create(userDto: CreateUserDTO) {
@@ -40,7 +43,9 @@ export class UsersService {
       userDto.password = await bcrypt.hash(userDto.password, 10);
       const created = new this.usersModel(userDto);
       this.walletsService.createWallet({ name: 'Wallet' }, userDto.username);
-      return created.save();
+      await created.save();
+      delete userDto.password;
+      return userDto;
     } catch (error) {}
   }
 
