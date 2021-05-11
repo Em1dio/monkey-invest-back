@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import * as bcrypt from 'bcrypt';
 import { WalletsService } from 'src/wallets/wallets.service';
-import { CreateUserDTO, UpdateUserDTO } from './dto';
+import { ChangePasswordDTO, CreateUserDTO, UpdateUserDTO } from './dto';
 import { Users, UsersFeatureProvider } from './schemas/users.schema';
 
 @Injectable()
@@ -14,7 +14,6 @@ export class UsersService {
     private readonly usersModel: ReturnModelType<typeof Users>,
   ) {}
 
-  // READ
   public async findAll() {
     return this.usersModel.find().exec();
   }
@@ -23,7 +22,16 @@ export class UsersService {
     return this.usersModel.findOne({ username }).exec();
   }
 
-  // CREATE
+  public async changePassword(dto: ChangePasswordDTO, username: string) {
+    const doc = await this.usersModel.findOne({ username }).lean();
+    const comparePassword = await bcrypt.compare(dto.oldPassword, doc.password);
+    if (comparePassword) {
+      doc.password = await bcrypt.hash(dto.password, 10);
+      return this.usersModel.updateOne({ _id: doc._id }, doc).exec();
+     }
+     throw new BadRequestException('Incorrect Password');
+  }
+
   public async create(userDto: CreateUserDTO) {
     try {
       if (!this.isEmailValid(userDto.username)) {
@@ -40,12 +48,10 @@ export class UsersService {
     return this.usersModel.findOne({ username });
   }
 
-  // DELETE
   public async delete(id: string) {
     return this.usersModel.findByIdAndDelete(id);
   }
 
-  // UPDATE
   public async update(userUserDto: UpdateUserDTO) {
     return this.usersModel
       .updateOne({ _id: userUserDto.id }, userUserDto)
