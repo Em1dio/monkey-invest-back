@@ -120,7 +120,10 @@ export class StocksService {
       username,
     );
     if (!isValid) {
-      throw new Error('This user doenst have access to this Wallet');
+      throw new HttpException(
+        'This user doenst have access to this Wallet',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const result = await this.stocksModel.findOne({
@@ -128,7 +131,10 @@ export class StocksService {
       walletId: dto.walletId,
     });
     if (!result) {
-      throw new Error('User doenst have this Stock');
+      throw new HttpException(
+        'User doenst have this Stock',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return this.stocksModel.findByIdAndDelete(dto.id);
   }

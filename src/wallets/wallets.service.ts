@@ -1,4 +1,10 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { promises } from 'dns';
@@ -26,7 +32,7 @@ export class WalletsService {
       const created = new this.walletsModel(walletDto);
       return created.save();
     } catch (error) {
-      throw new Error(error);
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -89,13 +95,13 @@ export class WalletsService {
       const created = new this.walletsModel(walletDto);
       return created.save();
     } catch (error) {
-      throw new Error(error);
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
     }
   }
 
   private async calculateTotals(walletId: string) {
     // Solucao @MeChamoGeo
-    
+
     // Caio vai nesse site (https://lodash.com/) e abre o inspect e cola no terminal kkkk
 
     // var items = [
