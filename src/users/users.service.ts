@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import * as bcrypt from 'bcrypt';
@@ -36,20 +41,24 @@ export class UsersService {
   }
 
   public async create(userDto: CreateUserDTO) {
+    const existUsername = await !this.isEmailValid(userDto.username);
+    if (!existUsername) {
+      throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
+    }
+
     try {
-      if (!this.isEmailValid(userDto.username)) {
-        throw {};
-      }
       userDto.password = await bcrypt.hash(userDto.password, 10);
       const created = new this.usersModel(userDto);
       this.walletsService.createWallet({ name: 'Wallet' }, userDto.username);
       await created.save();
       delete userDto.password;
       return userDto;
-    } catch (error) {}
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.BAD_REQUEST);
+    }
   }
 
-  private isEmailValid(username: string) {
+  private async isEmailValid(username: string) {
     return this.usersModel.findOne({ username });
   }
 
