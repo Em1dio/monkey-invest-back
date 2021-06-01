@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Request,
@@ -32,14 +33,18 @@ export class WalletsController {
   }
 
   // UPDATE - PUT
-  @Put()
-  public updateWallet(@Body() walletDto: UpdateWalletDTO, @Request() req) {
-    return this.walletsService.update(walletDto);
+  @Put(':id')
+  public updateWallet(
+    @Param('id') id: string,
+    @Body() walletDto: UpdateWalletDTO,
+    @User('username') username
+  ) {
+    return this.walletsService.update(id, walletDto, username);
   }
 
   // DELETE - DELETE - caso o numero seja igual a 0. Criar uma nova carteira vazia.
-  @Delete()
-  public remove(@Body('id') id: string,  @User('username') username) {
+  @Delete(':id')
+  public remove(@Param('id') id: string,  @User('username') username) {
     return this.walletsService.remove(id, username);
   }
 }

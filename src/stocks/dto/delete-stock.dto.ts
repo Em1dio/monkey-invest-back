@@ -1,9 +1,11 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class DeleteStockDto {
   @IsString()
-  id: string;
+  @IsOptional()
+  id?: string;
 
   @IsString()
-  walletId: string;
+  @IsOptional()
+  walletId?: string;
 }

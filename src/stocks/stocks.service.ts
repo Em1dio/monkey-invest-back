@@ -139,6 +139,10 @@ export class StocksService {
     return this.stocksModel.findByIdAndDelete(dto.id);
   }
 
+  public async deleteWallet(dto: DeleteStockDto) {
+    return this.stocksModel.deleteMany({ walletId: dto.walletId });
+  }
+
   // UPDATE
   public async update(stockUserDto: UpdateStockUserDto) {
     return this.stocksModel
