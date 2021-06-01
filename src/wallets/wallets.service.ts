@@ -3,11 +3,10 @@ import {
   HttpException,
   HttpStatus,
   Inject,
-  Injectable,
+  Injectable
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { promises } from 'dns';
 import { CryptocoinsService } from 'src/cryptocoins/cryptocoins.service';
 import { StocksService } from 'src/stocks/stocks.service';
 import { CreateWalletDTO } from './dto/create-wallet.dto';
@@ -50,9 +49,16 @@ export class WalletsService {
     return result;
   }
 
-  public async update(dto: UpdateWalletDTO) {
-    const wallet = this.walletsModel.find({ _id: dto.id }).exec();
-    return this.walletsModel.updateOne({ _id: dto.id }, dto).exec();
+  public async update(id: string, dto: UpdateWalletDTO, username: string) {
+    const isValid = await this.validateWallet(
+      id,
+      username,
+    );
+    if (!isValid) {
+      throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
+    }
+    await this.walletsModel.updateOne({ _id: id }, dto).exec();
+    return this.walletsModel.find({ _id: dto.id }).exec();
   }
 
   public async validateWallet(walletId: string, username: string) {
@@ -79,7 +85,7 @@ export class WalletsService {
 
     // caso nao exista, crie uma.
     if (existingWallets === 0) {
-      this.createWallet({ name: 'wallet' }, username);
+      this.createWallet({ name: 'Carteira' }, username);
     }
   }
 
