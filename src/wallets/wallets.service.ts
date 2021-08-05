@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { CryptocoinsService } from 'src/cryptocoins/cryptocoins.service';
-import { StocksService } from 'src/stocks/stocks.service';
+import { CryptocoinsService } from './../cryptocoins/cryptocoins.service';
+import { StocksService } from './../stocks/stocks.service';
 import { CreateWalletDTO } from './dto/create-wallet.dto';
 import { UpdateWalletDTO } from './dto/update-wallet.dto';
 import { Wallets, WalletsFeatureProvider } from './schemas/wallets.schema';
@@ -106,22 +106,6 @@ export class WalletsService {
   }
 
   private async calculateTotals(walletId: string) {
-    // Solucao @MeChamoGeo
-
-    // Caio vai nesse site (https://lodash.com/) e abre o inspect e cola no terminal kkkk
-
-    // var items = [
-    //   { 'lightBlue': 4, 'darkBlue': 2, 'red': 4, 'orange': 6, 'purple': 7 },
-    //   { 'lightBlue': 6, 'darkBlue': 5, 'red': 1, 'orange': 2, 'purple': 3 },
-    //   { 'lightBlue': 2, 'darkBlue': 4, 'red': 3, 'orange': 4, 'purple': 9 }
-    // ],
-
-    // userSelectedColors = ['lightBlue', 'darkBlue'];
-
-    // var totalCount = _.sumBy(userSelectedColors, _.partial(_.sumBy, items));
-
-    // console.log(totalCount);
-
     const totals = { totalBefore: 0, totalActual: 0 };
 
     const [stocksConsolidated, cryptoConsolidated] = await Promise.all([

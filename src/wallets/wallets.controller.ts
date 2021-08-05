@@ -9,8 +9,8 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { User } from 'src/users/decorators/Index.decorator';
+import { JwtAuthGuard } from './../auth/jwt-auth.guard';
+import { User } from './../users/decorators/Index.decorator';
 import { CreateWalletDTO } from './dto/create-wallet.dto';
 import { UpdateWalletDTO } from './dto/update-wallet.dto';
 import { WalletsService } from './wallets.service';

@@ -8,7 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import * as bcrypt from 'bcrypt';
 import { doc } from 'prettier';
-import { WalletsService } from 'src/wallets/wallets.service';
+import { WalletsService } from './../wallets/wallets.service';
 import { ChangePasswordDTO, CreateUserDTO, UpdateUserDTO } from './dto';
 import { Users, UsersFeatureProvider } from './schemas/users.schema';
 
@@ -41,8 +41,8 @@ export class UsersService {
   }
 
   public async create(userDto: CreateUserDTO) {
-    const existUsername = await !this.isEmailValid(userDto.username);
-    if (!existUsername) {
+    const existUsername = await this.usersModel.findOne({ username: userDto.username });
+    if (existUsername) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
     }
 

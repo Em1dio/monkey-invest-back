@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
-import { WalletsService } from 'src/wallets/wallets.service';
+import { WalletsService } from './../wallets/wallets.service';
 import { CreateCryptoDto } from './dto/create-crypto.dto';
 import { DeleteCryptoDto } from './dto/delete-crypto.dto';
 import { CryptoFeatureProvider } from './schemas/cryptocoins.schema';

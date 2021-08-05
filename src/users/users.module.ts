@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersController } from './users.controller';
 import { UsersFeatureProvider } from './schemas/users.schema';
-import { WalletsModule } from 'src/wallets/wallets.module';
+import { WalletsModule } from './../wallets/wallets.module';
 
 @Module({
   imports: [WalletsModule, MongooseModule.forFeature([UsersFeatureProvider])],

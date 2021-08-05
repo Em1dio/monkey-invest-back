@@ -3,7 +3,7 @@ import { StocksController } from './stocks.controller';
 import { StocksService } from './stocks.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { StocksFeatureProvider } from './schemas/stocks.schema';
-import { WalletsModule } from 'src/wallets/wallets.module';
+import { WalletsModule } from './../wallets/wallets.module';
 
 @Module({
   imports: [

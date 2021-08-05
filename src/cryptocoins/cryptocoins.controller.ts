@@ -10,8 +10,8 @@ import {
   Request,
   Headers,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { User } from 'src/users/decorators/Index.decorator';
+import { JwtAuthGuard } from './../auth/jwt-auth.guard';
+import { User } from './../users/decorators/Index.decorator';
 import { CryptocoinsService } from './cryptocoins.service';
 import { CreateCryptoDto } from './dto/create-crypto.dto';
 import { DeleteCryptoDto } from './dto/delete-crypto.dto';
