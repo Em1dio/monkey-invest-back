@@ -42,6 +42,25 @@ export class WalletsController {
     return this.walletsService.update(id, walletDto, username);
   }
 
+  @Put(':id/add-shareduser')
+  public shareWallet(
+    @Param('id') id: string,
+    @Body() body: {username: string},
+    @User('username') owner
+
+  ) {
+    return this.walletsService.shareWallet(id, body.username, owner);
+  }
+
+  @Put(':id/remove-shareduser')
+  public unshareWallet(
+    @Param('id') id: string,
+    @Body() body: {username: string},
+    @User('username') owner
+  ) {
+    return this.walletsService.unshareWallet(id, body.username, owner);
+  }
+
   // DELETE - DELETE - caso o numero seja igual a 0. Criar uma nova carteira vazia.
   @Delete(':id')
   public remove(@Param('id') id: string,  @User('username') username) {

@@ -44,8 +44,8 @@ export class StocksService {
     for (const el of stocks) {
       const stock = apiStock.find(x => x.symbol === el.symbol);
       const data = {
-        actualValue: stock.regularMarketPrice,
-        actualTotal: stock.regularMarketPrice * el.quantity,
+        actualValue: stock?.regularMarketPrice || 0,
+        actualTotal: stock?.regularMarketPrice * el?.quantity || 0,
         total: el.value * el.quantity,
       };
       result.push({ ...el, ...data });
@@ -91,7 +91,7 @@ export class StocksService {
 
     for (const stock of stocks) {
       const actualValue = apiStock.find(x => x.symbol === stock._id)
-        .regularMarketPrice;
+        ?.regularMarketPrice;
       result.totalBefore += stock.total;
       result.totalActual += actualValue * stock.quantity;
     }
@@ -108,6 +108,7 @@ export class StocksService {
         HttpStatus.EXPECTATION_FAILED,
       );
     }
+    stockUserDto.symbol = stockUserDto.symbol.toUpperCase();
     stockUserDto.userId = username;
     const created = new this.stocksModel(stockUserDto);
     return created.save();

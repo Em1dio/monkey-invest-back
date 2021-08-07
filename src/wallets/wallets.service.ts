@@ -3,7 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Inject,
-  Injectable
+  Injectable,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
@@ -12,6 +12,11 @@ import { StocksService } from './../stocks/stocks.service';
 import { CreateWalletDTO } from './dto/create-wallet.dto';
 import { UpdateWalletDTO } from './dto/update-wallet.dto';
 import { Wallets, WalletsFeatureProvider } from './schemas/wallets.schema';
+
+enum Action {
+  Add = 'add',
+  Remove = 'remove',
+}
 
 @Injectable()
 export class WalletsService {
@@ -35,13 +40,37 @@ export class WalletsService {
     }
   }
 
+  public async shareWallet(walletId: string, username: string, owner: string) {
+    const wallet = await this.walletsModel.findOne({ _id: walletId }).exec();
+
+    this.validateSharedWalletActions(wallet, owner, username, Action.Add);
+
+    wallet.sharedUsers.push(username);
+    await this.walletsModel.updateOne({ _id: walletId }, wallet).exec();
+  }
+
+  public async unshareWallet(
+    walletId: string,
+    username: string,
+    owner: string,
+  ) {
+    const wallet = await this.walletsModel.findOne({ _id: walletId }).exec();
+    this.validateSharedWalletActions(wallet, owner, username, Action.Remove);
+
+    wallet.sharedUsers.splice(wallet.sharedUsers.indexOf(username), 1);
+    await this.walletsModel.updateOne({ _id: walletId }, wallet).exec();
+  }
+
   public async find(username: string) {
     const owner = await this.walletsModel
       .find({ ownerUsername: username })
       .exec();
-    // const shared = await this.walletsModel.find({ sharedUsers: {$in: });
+    const shared = await this.walletsModel
+      .find({ sharedUsers: { $in: [username] } })
+      .exec();
     const result = [];
-    for (const wallet of owner) {
+    const wallets = [...owner, ...shared];
+    for (const wallet of wallets) {
       const totals = await this.calculateTotals(wallet._id.toString());
 
       result.push({ ...wallet._doc, ...totals });
@@ -50,10 +79,7 @@ export class WalletsService {
   }
 
   public async update(id: string, dto: UpdateWalletDTO, username: string) {
-    const isValid = await this.validateWallet(
-      id,
-      username,
-    );
+    const isValid = await this.validateWallet(id, username);
     if (!isValid) {
       throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
     }
@@ -67,7 +93,10 @@ export class WalletsService {
       return true;
     }
 
-    if (wallet.ownerUsername === username || username in wallet.sharedUsers) {
+    if (
+      wallet.ownerUsername === username ||
+      wallet.sharedUsers.includes(username)
+    ) {
       return true;
     }
 
@@ -89,22 +118,6 @@ export class WalletsService {
     }
   }
 
-  // Transactions
-  public async createTransaction(
-    walletDto: CreateWalletDTO,
-    username?: string,
-  ) {
-    try {
-      if (!walletDto.ownerUsername && username) {
-        walletDto.ownerUsername = username;
-      }
-      const created = new this.walletsModel(walletDto);
-      return created.save();
-    } catch (error) {
-      throw new HttpException(error, HttpStatus.BAD_REQUEST);
-    }
-  }
-
   private async calculateTotals(walletId: string) {
     const totals = { totalBefore: 0, totalActual: 0 };
 
@@ -120,5 +133,32 @@ export class WalletsService {
     totals.totalActual += cryptoConsolidated.totalActual;
 
     return totals;
+  }
+
+  private validateSharedWalletActions(
+    wallet: any,
+    owner: string,
+    username: string,
+    action: Action,
+  ) {
+    if (wallet.ownerUsername !== owner) {
+      throw new HttpException(
+        'You need to be the owner to do this action.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (!wallet) {
+      throw new HttpException('Wallet not exist', HttpStatus.BAD_REQUEST);
+    }
+
+    if (action === Action.Add) {
+      if (wallet.sharedUsers.includes(username)) {
+        throw new HttpException('User exist in Shared Users', HttpStatus.BAD_REQUEST);
+      }
+    } else {
+      if (!wallet.sharedUsers.includes(username)) {
+        throw new HttpException('User not exist in Shared Users', HttpStatus.BAD_REQUEST);
+      }
+    }
   }
 }
