@@ -116,14 +116,46 @@ export class CryptocoinsService {
   }
 
   public async getCryptos() {
-    const crypto = ['BTC','LTC','ETH', 'XRP'];
+    const crypto = [
+      'BTC',
+      'ETH',
+      'BNB',
+      'ADA',
+      'USDT',
+      'XRP',
+      'DOGE',
+      'HEX',
+      'USDC',
+      'DOT1',
+      'SOL1',
+      'UNI3',
+      'BCH',
+      'LINK',
+      'LTC',
+      'MATIC',
+      'LUNA1',
+      'ETC',
+      'XLM',
+      'ICP1',
+      'VET',
+      'THETA',
+      'FIL',
+      'TRX',
+      'AAVE',
+    ];
     return crypto;
   }
 
   private async apiCheck(): Promise<ICrypto[]> {
     const crypto = await this.getCryptos();
     try {
-      const response = await this.httpService.get(`https://brapi.ga/api/v2/crypto?coin=${crypto.join(',')}&currency=BRL`).toPromise();
+      const response = await this.httpService
+        .get(
+          `https://brapi.ga/api/v2/crypto?coin=${crypto.join(
+            ',',
+          )}&currency=BRL`,
+        )
+        .toPromise();
       return response.data.coins;
     } catch (error) {
       throw new HttpException(
