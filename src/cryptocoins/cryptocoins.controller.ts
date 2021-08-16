@@ -21,6 +21,11 @@ import { DeleteCryptoDto } from './dto/delete-crypto.dto';
 export class CryptocoinsController {
   constructor(private readonly cryptocoinsService: CryptocoinsService) {}
 
+  @Get('get-crypto')
+  public getCryptos() {
+    return this.cryptocoinsService.getCryptos();
+  }
+
   @Get('consolidated/:walletId')
   public consolidated(@Param('walletId') walletId: string) {
     return this.cryptocoinsService.consolidated(walletId);

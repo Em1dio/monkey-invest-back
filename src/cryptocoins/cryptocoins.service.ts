@@ -13,18 +13,22 @@ import { CreateCryptoDto } from './dto/create-crypto.dto';
 import { DeleteCryptoDto } from './dto/delete-crypto.dto';
 import { CryptoFeatureProvider } from './schemas/cryptocoins.schema';
 export interface ICrypto {
-  code: string;
-  // codein: string;
-  // name: string;
-  // high: string;
-  // low: string;
-  // varBid: string;
-  // pctChange: string;
-  bid: string;
-  // ask: string;
-  // timestamp: string;
-  // create_date: string;
+  currency: string;
+  currencyRateFromUSD: number;
+  coinName: string;
+  coin: string;
+  regularMarketChange: number;
+  regularMarketPrice: number;
+  regularMarketChangePercent: number;
+  regularMarketDayLow: number;
+  regularMarketDayHigh: number;
+  regularMarketDayRange: string;
+  regularMarketVolume: number;
+  marketCap: number;
+  regularMarketTime: number;
+  coinImageUrl: string;
 }
+
 @Injectable()
 export class CryptocoinsService {
   constructor(
@@ -111,23 +115,28 @@ export class CryptocoinsService {
     return this.cryptoModel.findByIdAndDelete(dto.id);
   }
 
+  public async getCryptos() {
+    const crypto = ['BTC','LTC','ETH', 'XRP'];
+    return crypto;
+  }
+
   private async apiCheck(): Promise<ICrypto[]> {
-    const url = 'https://economia.awesomeapi.com.br/last/BTC,LTC,ETH,XRP';
+    const crypto = await this.getCryptos();
     try {
-      const response = await this.httpService.get(url).toPromise();
-      return response.data;
+      const response = await this.httpService.get(`https://brapi.ga/api/v2/crypto?coin=${crypto.join(',')}&currency=BRL`).toPromise();
+      return response.data.coins;
     } catch (error) {
       throw new HttpException(
-        'brapi doenst recognize this stock',
+        'brapi doenst recognize this crypto',
         HttpStatus.EXPECTATION_FAILED,
       );
     }
   }
 
   private async getActualValues() {
-    const results = Object.values(await this.apiCheck());
+    const results = await this.apiCheck();
     const actual = results.reduce((acc, cur) => {
-      acc.push({ code: cur.code, value: +cur.bid });
+      acc.push({ code: cur.coin, value: +cur.regularMarketPrice });
       return acc;
     }, []);
     return actual;
