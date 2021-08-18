@@ -11,6 +11,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { WalletsService } from './../wallets/wallets.service';
 import { CreateCryptoDto } from './dto/create-crypto.dto';
 import { DeleteCryptoDto } from './dto/delete-crypto.dto';
+import { UpdateCryptoDto } from './dto/update-crypto.dto';
 import { CryptoFeatureProvider } from './schemas/cryptocoins.schema';
 export interface ICrypto {
   currency: string;
@@ -113,6 +114,21 @@ export class CryptocoinsService {
       );
     }
     return this.cryptoModel.findByIdAndDelete(dto.id);
+  }
+
+  public async update(walletId: string, username: string, dto: UpdateCryptoDto) {
+    // wallet is valid 
+    const wallet = await this.walletsService.validateWallet(walletId, username);
+    if (!wallet) {
+      throw new HttpException(
+        'User doenst have access to this wallet',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return this.cryptoModel
+      .updateOne({ _id: dto._id }, dto)
+      .exec();
   }
 
   public async getCryptos() {

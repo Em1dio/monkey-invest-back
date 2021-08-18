@@ -15,6 +15,7 @@ import { User } from './../users/decorators/Index.decorator';
 import { CryptocoinsService } from './cryptocoins.service';
 import { CreateCryptoDto } from './dto/create-crypto.dto';
 import { DeleteCryptoDto } from './dto/delete-crypto.dto';
+import { UpdateCryptoDto } from './dto/update-crypto.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('cryptocoins')
@@ -41,13 +42,20 @@ export class CryptocoinsController {
     return this.cryptocoinsService.create(dto, username);
   }
 
-  @Delete(':walletId/:id')
-  public async delete(@Request() req, @Param() deleteDto: DeleteCryptoDto) {
-    return this.cryptocoinsService.delete(deleteDto);
+  @Put(':walletId/:id')
+  async update(
+    @User('username') username,
+    @Param('walletId') walletId: string,
+    @Body() dto: UpdateCryptoDto,
+  ) {
+    return this.cryptocoinsService.update(walletId, username, dto);
   }
 
-  // @Delete()
-  // public async delete(@Body() deleteDto: DeleteCryptoDto) {
-  //   return this.cryptocoinsService.delete(deleteDto);
-  // }
+  @Delete(':walletId/:id')
+  public async delete(
+    @User('username') username,
+    @Param() deleteDto: DeleteCryptoDto,
+  ) {
+    return this.cryptocoinsService.delete(deleteDto);
+  }
 }
