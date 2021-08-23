@@ -89,6 +89,10 @@ export class WalletsService {
 
   public async validateWallet(walletId: string, username: string) {
     const wallet = await this.walletsModel.findOne({ _id: walletId }).exec();
+    if (!wallet) {
+      return false;
+    }
+
     if (wallet.isPublic) {
       return true;
     }

@@ -9,6 +9,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { WalletsService } from './../wallets/wallets.service';
+import { ITransferCrypto } from './cryptocoins.interface';
 import { CreateCryptoDto } from './dto/create-crypto.dto';
 import { DeleteCryptoDto } from './dto/delete-crypto.dto';
 import { UpdateCryptoDto } from './dto/update-crypto.dto';
@@ -116,8 +117,12 @@ export class CryptocoinsService {
     return this.cryptoModel.findByIdAndDelete(dto.id);
   }
 
-  public async update(walletId: string, username: string, dto: UpdateCryptoDto) {
-    // wallet is valid 
+  public async update(
+    walletId: string,
+    username: string,
+    dto: UpdateCryptoDto,
+  ) {
+    // wallet is valid
     const wallet = await this.walletsService.validateWallet(walletId, username);
     if (!wallet) {
       throw new HttpException(
@@ -126,9 +131,7 @@ export class CryptocoinsService {
       );
     }
 
-    return this.cryptoModel
-      .updateOne({ _id: dto._id }, dto)
-      .exec();
+    return this.cryptoModel.updateOne({ _id: dto._id }, dto).exec();
   }
 
   public async getCryptos() {
@@ -188,5 +191,28 @@ export class CryptocoinsService {
       return acc;
     }, []);
     return actual;
+  }
+
+  public async transfer(username: string, data: ITransferCrypto) {
+    const wallet = await this.walletsService.validateWallet(data.walletId, username);
+    const walletTo = await this.walletsService.validateWallet(data.walletTo, username);
+    if (!wallet || !walletTo) {
+      throw new HttpException(
+        'User doesnt have access to these wallets',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const crypto = await this.cryptoModel.findOne({ _id: data.id, walletId: data.walletId });
+    if (!crypto) {
+      throw new HttpException(
+        'User doesnt have this Crypto',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    crypto.walletId = data.walletTo;
+    await crypto.save();
+
+    return crypto;
   }
 }

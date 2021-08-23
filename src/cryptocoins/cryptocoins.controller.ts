@@ -13,9 +13,12 @@ import {
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import { User } from './../users/decorators/Index.decorator';
 import { CryptocoinsService } from './cryptocoins.service';
-import { CreateCryptoDto } from './dto/create-crypto.dto';
-import { DeleteCryptoDto } from './dto/delete-crypto.dto';
-import { UpdateCryptoDto } from './dto/update-crypto.dto';
+import {
+  CreateCryptoDto,
+  DeleteCryptoDto,
+  TransferCryptoDto,
+  UpdateCryptoDto,
+} from './dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('cryptocoins')
@@ -35,6 +38,21 @@ export class CryptocoinsController {
   @Get(':walletId')
   public findAll(@Param('walletId') walletId: string) {
     return this.cryptocoinsService.findAll(walletId);
+  }
+
+  @Post('transfer/:walletId/:id')
+  async transfer(
+    @User('username') username,
+    @Param('walletId') walletId: string,
+    @Param('id') id: string,
+    @Body() dto: TransferCryptoDto,
+  ) {
+    const data = {
+      ...dto,
+      id,
+      walletId,
+    };
+    return this.cryptocoinsService.transfer(username, data);
   }
 
   @Post()
