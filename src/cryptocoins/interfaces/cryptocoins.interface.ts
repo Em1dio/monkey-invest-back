@@ -1,5 +1,5 @@
 export interface ITransferCrypto {
     id: string;
-    walletId: string;
+    walletFrom: string;
     walletTo: string;
   }

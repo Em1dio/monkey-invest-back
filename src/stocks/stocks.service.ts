@@ -11,6 +11,7 @@ import { ReturnModelType } from '@typegoose/typegoose';
 import { CreateStockDto, DeleteStockDto, UpdateStockUserDto } from './dto';
 import { Stocks, StocksFeatureProvider } from './schemas/stocks.schema';
 import { WalletsService } from './../wallets/wallets.service';
+import { ITransferStock } from './interfaces/stocks.interface';
 @Injectable()
 export class StocksService {
   constructor(
@@ -169,4 +170,28 @@ export class StocksService {
     const response = await this.httpService.get(url).toPromise();
     return response.data.stocks.length === 1;
   }
+
+  public async transfer(username: string, data: ITransferStock) {
+    const wallet = await this.walletsService.validateWallet(data.walletFrom, username);
+    const walletTo = await this.walletsService.validateWallet(data.walletTo, username);
+    if (!wallet || !walletTo) {
+      throw new HttpException(
+        'User doesnt have access to these wallets',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const stock = await this.stocksModel.findOne({ _id: data.id, walletId: data.walletFrom });
+    if (!stock) {
+      throw new HttpException(
+        'User doesnt have this stock',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    stock.walletId = data.walletTo;
+    await stock.save();
+
+    return stock;
+  }
+
 }

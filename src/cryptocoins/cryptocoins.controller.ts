@@ -40,17 +40,15 @@ export class CryptocoinsController {
     return this.cryptocoinsService.findAll(walletId);
   }
 
-  @Post('transfer/:walletId/:id')
+  @Post('transfer/:id')
   async transfer(
     @User('username') username,
-    @Param('walletId') walletId: string,
     @Param('id') id: string,
     @Body() dto: TransferCryptoDto,
   ) {
     const data = {
       ...dto,
       id,
-      walletId,
     };
     return this.cryptocoinsService.transfer(username, data);
   }

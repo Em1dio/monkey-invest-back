@@ -9,7 +9,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { WalletsService } from './../wallets/wallets.service';
-import { ITransferCrypto } from './cryptocoins.interface';
+import { ITransferCrypto } from './interfaces/cryptocoins.interface';
 import { CreateCryptoDto } from './dto/create-crypto.dto';
 import { DeleteCryptoDto } from './dto/delete-crypto.dto';
 import { UpdateCryptoDto } from './dto/update-crypto.dto';
@@ -194,7 +194,7 @@ export class CryptocoinsService {
   }
 
   public async transfer(username: string, data: ITransferCrypto) {
-    const wallet = await this.walletsService.validateWallet(data.walletId, username);
+    const wallet = await this.walletsService.validateWallet(data.walletFrom, username);
     const walletTo = await this.walletsService.validateWallet(data.walletTo, username);
     if (!wallet || !walletTo) {
       throw new HttpException(
@@ -203,7 +203,7 @@ export class CryptocoinsService {
       );
     }
 
-    const crypto = await this.cryptoModel.findOne({ _id: data.id, walletId: data.walletId });
+    const crypto = await this.cryptoModel.findOne({ _id: data.id, walletId: data.walletFrom });
     if (!crypto) {
       throw new HttpException(
         'User doesnt have this Crypto',

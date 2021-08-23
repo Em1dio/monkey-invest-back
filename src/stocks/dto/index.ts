@@ -1,3 +1,4 @@
-export * from './create-stock-user.dto'
-export * from './update-stock-user.dto'
+export * from './create-stock.dto'
+export * from './update-stock.dto'
+export * from './transfer-stock.dto'
 export * from './delete-stock.dto'

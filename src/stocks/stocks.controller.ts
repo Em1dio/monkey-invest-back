@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import { User } from './../users/decorators/Index.decorator';
-import { CreateStockDto, UpdateStockUserDto, DeleteStockDto } from './dto';
+import { CreateStockDto, UpdateStockUserDto, DeleteStockDto, TransferStockDto } from './dto';
 import { StocksService } from './stocks.service';
 
 @UseGuards(JwtAuthGuard)
@@ -28,6 +28,21 @@ export class StocksController {
   @Get(':walletId')
   public findAll(@User('username') username, @Param('walletId') walletId: string) {
     return this.stocksService.findAll(username, walletId);
+  }
+
+  @Post('transfer/:walletId/:id')
+  async transfer(
+    @User('username') username,
+    @Param('walletId') walletId: string,
+    @Param('id') id: string,
+    @Body() dto: TransferStockDto,
+  ) {
+    const data = {
+      ...dto,
+      id,
+      walletId,
+    };
+    return this.stocksService.transfer(username, data);
   }
 
   @Post()
