@@ -30,17 +30,15 @@ export class StocksController {
     return this.stocksService.findAll(username, walletId);
   }
 
-  @Post('transfer/:walletId/:id')
+  @Post('transfer/:id')
   async transfer(
     @User('username') username,
-    @Param('walletId') walletId: string,
     @Param('id') id: string,
     @Body() dto: TransferStockDto,
   ) {
     const data = {
       ...dto,
       id,
-      walletId,
     };
     return this.stocksService.transfer(username, data);
   }
