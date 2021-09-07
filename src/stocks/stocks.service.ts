@@ -22,7 +22,6 @@ export class StocksService {
     private readonly stocksModel: ReturnModelType<typeof Stocks>,
   ) {}
 
-  // READ
   public async findAll(username: string, walletId: string) {
     const result = [];
 
@@ -59,7 +58,6 @@ export class StocksService {
     return this.stocksModel.findOne({ _id: id, userID: user }).lean();
   }
 
-  // CONSOLIDATED - #TASK-001
   public async consolidated(walletId: string) {
     const stocks = await this.stocksModel
       .aggregate([
@@ -100,7 +98,6 @@ export class StocksService {
     return result;
   }
 
-  // CREATE
   public async create(stockUserDto: CreateStockDto, username: string) {
     const isValidStock = await this.apiValidateStock(stockUserDto.symbol);
     if (!isValidStock) {
@@ -115,7 +112,6 @@ export class StocksService {
     return created.save();
   }
 
-  // DELETE
   public async delete(dto: DeleteStockDto, username: string) {
     const isValid = await this.walletsService.validateWallet(
       dto.walletId,
