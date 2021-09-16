@@ -29,11 +29,6 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Post()
-  async create(@Body() stockDto: CreateUserDTO): Promise<any> {
-    return this.usersService.create(stockDto);
-  }
-
   @UseGuards(JwtAuthGuard)
   @Post('change-password')
   async changePassword(
@@ -41,6 +36,11 @@ export class UsersController {
     @Body() stockDto: ChangePasswordDTO,
   ) {
     return this.usersService.changePassword(stockDto, username);
+  }
+
+  @Post()
+  async create(@Body() stockDto: CreateUserDTO): Promise<any> {
+    return this.usersService.create(stockDto);
   }
 
   @UseGuards(JwtAuthGuard)
