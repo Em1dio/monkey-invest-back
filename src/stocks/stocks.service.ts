@@ -25,14 +25,6 @@ export class StocksService {
   public async findAll(username: string, walletId: string) {
     const result = [];
 
-    const isValid = await this.walletsService.validateWallet(
-      walletId,
-      username,
-    );
-    if (!isValid) {
-      return result;
-    }
-
     const stocks = await this.stocksModel.find({ walletId }).lean();
     const symbols = stocks.map(x => x.symbol).join(',');
 
@@ -113,17 +105,6 @@ export class StocksService {
   }
 
   public async delete(dto: DeleteStockDto, username: string) {
-    const isValid = await this.walletsService.validateWallet(
-      dto.walletId,
-      username,
-    );
-    if (!isValid) {
-      throw new HttpException(
-        'This user doenst have access to this Wallet',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
     const result = await this.stocksModel.findOne({
       _id: dto.id,
       walletId: dto.walletId,

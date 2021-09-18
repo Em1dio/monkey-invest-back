@@ -2,15 +2,18 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
-  Param,
+  Get, Headers, Param,
   Post,
   Put,
   UseGuards
 } from '@nestjs/common';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
+import { ValidWalletGuard } from './../auth/validWallet.guard';
 import { User } from './../users/decorators/Index.decorator';
-import { CreateStockDto, DeleteStockDto, TransferStockDto, UpdateStockUserDto } from './dto';
+import {
+  CreateStockDto, TransferStockDto,
+  UpdateStockUserDto
+} from './dto';
 import { StocksService } from './stocks.service';
 
 @UseGuards(JwtAuthGuard)
@@ -18,16 +21,15 @@ import { StocksService } from './stocks.service';
 export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
 
-  @Get('consolidated/:walletId')
-  public consolidated(@Param('walletId') walletId: string) {
+  @UseGuards(ValidWalletGuard)
+  @Get('consolidated')
+  public consolidated(@Headers('walletid') walletId) {
     return this.stocksService.consolidated(walletId);
   }
 
-  @Get(':walletId')
-  public findAll(
-    @User('username') username,
-    @Param('walletId') walletId: string,
-  ) {
+  @UseGuards(ValidWalletGuard)
+  @Get()
+  public findAll(@User('username') username, @Headers('walletid') walletId) {
     return this.stocksService.findAll(username, walletId);
   }
 
@@ -44,17 +46,26 @@ export class StocksController {
     return this.stocksService.transfer(username, data);
   }
 
+  @UseGuards(ValidWalletGuard)
   @Post()
-  async create(@User('username') username, @Body() stockDto: CreateStockDto) {
-    return this.stocksService.create(stockDto, username);
+  async create(
+    @Headers('walletid') walletId,
+    @User('username') username,
+    @Body() stockDto: CreateStockDto,
+  ) {
+    const data = { walletId, ...stockDto };
+    return this.stocksService.create(data, username);
   }
 
-  @Delete(':walletId/:id')
+  @UseGuards(ValidWalletGuard)
+  @Delete(':id')
   public async delete(
+    @Headers('walletid') walletId,
     @User('username') username,
-    @Param() deleteDto: DeleteStockDto,
+    @Param('id') id: string,
   ) {
-    return this.stocksService.delete(deleteDto, username);
+    const data = { id, walletId };
+    return this.stocksService.delete(data, username);
   }
 
   @Put()

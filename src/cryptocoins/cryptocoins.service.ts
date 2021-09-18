@@ -9,27 +9,11 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import { WalletsService } from './../wallets/wallets.service';
-import { ITransferCrypto } from './interfaces/cryptocoins.interface';
+import { ICrypto, ITransferCrypto } from './interfaces/cryptocoins.interface';
 import { CreateCryptoDto } from './dto/create-crypto.dto';
 import { DeleteCryptoDto } from './dto/delete-crypto.dto';
 import { UpdateCryptoDto } from './dto/update-crypto.dto';
 import { CryptoFeatureProvider } from './schemas/cryptocoins.schema';
-export interface ICrypto {
-  currency: string;
-  currencyRateFromUSD: number;
-  coinName: string;
-  coin: string;
-  regularMarketChange: number;
-  regularMarketPrice: number;
-  regularMarketChangePercent: number;
-  regularMarketDayLow: number;
-  regularMarketDayHigh: number;
-  regularMarketDayRange: string;
-  regularMarketVolume: number;
-  marketCap: number;
-  regularMarketTime: number;
-  coinImageUrl: string;
-}
 
 @Injectable()
 export class CryptocoinsService {

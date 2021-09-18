@@ -2,12 +2,11 @@ import {
   BadRequestException,
   HttpException,
   HttpStatus,
-  Injectable,
+  Injectable
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ReturnModelType } from '@typegoose/typegoose';
 import * as bcrypt from 'bcrypt';
-import { doc } from 'prettier';
 import { WalletsService } from './../wallets/wallets.service';
 import { ChangePasswordDTO, CreateUserDTO, UpdateUserDTO } from './dto';
 import { Users, UsersFeatureProvider } from './schemas/users.schema';
@@ -29,6 +28,7 @@ export class UsersService {
   }
 
   public async changePassword(dto: ChangePasswordDTO, username: string) {
+    // tslint:disable-next-line: no-shadowed-variable
     const doc = await this.usersModel.findOne({ username }).lean();
     const comparePassword = await bcrypt.compare(dto.oldPassword, doc.password);
     if (comparePassword) {
@@ -37,11 +37,14 @@ export class UsersService {
       delete doc.password;
       return doc;
     }
+
     throw new BadRequestException('Incorrect Password');
   }
 
   public async create(userDto: CreateUserDTO) {
-    const existUsername = await this.usersModel.findOne({ username: userDto.username });
+    const existUsername = await this.usersModel.findOne({
+      username: userDto.username,
+    });
     if (existUsername) {
       throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
     }

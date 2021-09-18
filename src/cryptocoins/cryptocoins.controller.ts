@@ -10,15 +10,11 @@ import {
   Request,
   Headers,
 } from '@nestjs/common';
+import { ValidWalletGuard } from 'src/auth/validWallet.guard';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import { User } from './../users/decorators/Index.decorator';
 import { CryptocoinsService } from './cryptocoins.service';
-import {
-  CreateCryptoDto,
-  DeleteCryptoDto,
-  TransferCryptoDto,
-  UpdateCryptoDto,
-} from './dto';
+import { CreateCryptoDto, TransferCryptoDto, UpdateCryptoDto } from './dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('cryptocoins')
@@ -30,13 +26,15 @@ export class CryptocoinsController {
     return this.cryptocoinsService.getCryptos();
   }
 
-  @Get('consolidated/:walletId')
-  public consolidated(@Param('walletId') walletId: string) {
+  @UseGuards(ValidWalletGuard)
+  @Get('consolidated')
+  public consolidated(@Headers('walletid') walletId: string) {
     return this.cryptocoinsService.consolidated(walletId);
   }
 
-  @Get(':walletId')
-  public findAll(@Param('walletId') walletId: string) {
+  @UseGuards(ValidWalletGuard)
+  @Get()
+  public findAll(@Headers('walletid') walletId: string) {
     return this.cryptocoinsService.findAll(walletId);
   }
 
@@ -53,25 +51,35 @@ export class CryptocoinsController {
     return this.cryptocoinsService.transfer(username, data);
   }
 
+  @UseGuards(ValidWalletGuard)
   @Post()
-  async create(@User('username') username, @Body() dto: CreateCryptoDto) {
-    return this.cryptocoinsService.create(dto, username);
+  async create(
+    @User('username') username,
+    @Headers('walletid') walletId: string,
+    @Body() dto: CreateCryptoDto,
+  ) {
+    const data = { ...dto, walletId };
+    return this.cryptocoinsService.create(data, username);
   }
 
-  @Put(':walletId/:id')
+  @UseGuards(ValidWalletGuard)
+  @Put(':id')
   async update(
     @User('username') username,
-    @Param('walletId') walletId: string,
+    @Headers('walletid') walletId: string,
     @Body() dto: UpdateCryptoDto,
   ) {
     return this.cryptocoinsService.update(walletId, username, dto);
   }
 
-  @Delete(':walletId/:id')
+  @UseGuards(ValidWalletGuard)
+  @Delete(':id')
   public async delete(
     @User('username') username,
-    @Param() deleteDto: DeleteCryptoDto,
+    @Param('id') id: string,
+    @Headers('walletid') walletId: string,
   ) {
-    return this.cryptocoinsService.delete(deleteDto);
+    const data = { id, walletId };
+    return this.cryptocoinsService.delete(data);
   }
 }
