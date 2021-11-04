@@ -79,10 +79,6 @@ export class WalletsService {
   }
 
   public async update(id: string, dto: UpdateWalletDTO, username: string) {
-    const isValid = await this.validateWallet(id, username);
-    if (!isValid) {
-      throw new HttpException('Bad Request', HttpStatus.BAD_REQUEST);
-    }
     await this.walletsModel.updateOne({ _id: id }, dto).exec();
     return this.walletsModel.find({ _id: dto.id }).exec();
   }

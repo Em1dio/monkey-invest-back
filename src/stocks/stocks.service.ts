@@ -104,14 +104,14 @@ export class StocksService {
     return created.save();
   }
 
-  public async delete(dto: DeleteStockDto, username: string) {
+  public async delete(dto: DeleteStockDto) {
     const result = await this.stocksModel.findOne({
       _id: dto.id,
       walletId: dto.walletId,
     });
     if (!result) {
       throw new HttpException(
-        'User doenst have this Stock',
+        'User doesnt have this Stock',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -136,7 +136,7 @@ export class StocksService {
       return response.data.results;
     } catch (error) {
       throw new HttpException(
-        'brapi doenst recognize this stock',
+        'brapi doesnt recognize this stock',
         HttpStatus.EXPECTATION_FAILED,
       );
     }

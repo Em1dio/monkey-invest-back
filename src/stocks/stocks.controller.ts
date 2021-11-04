@@ -2,18 +2,17 @@ import {
   Body,
   Controller,
   Delete,
-  Get, Headers, Param,
+  Get,
+  Headers,
+  Param,
   Post,
   Put,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import { ValidWalletGuard } from './../auth/validWallet.guard';
 import { User } from './../users/decorators/Index.decorator';
-import {
-  CreateStockDto, TransferStockDto,
-  UpdateStockUserDto
-} from './dto';
+import { CreateStockDto, TransferStockDto, UpdateStockUserDto } from './dto';
 import { StocksService } from './stocks.service';
 
 @UseGuards(JwtAuthGuard)
@@ -59,13 +58,9 @@ export class StocksController {
 
   @UseGuards(ValidWalletGuard)
   @Delete(':id')
-  public async delete(
-    @Headers('walletid') walletId,
-    @User('username') username,
-    @Param('id') id: string,
-  ) {
+  public async delete(@Headers('walletid') walletId, @Param('id') id: string) {
     const data = { id, walletId };
-    return this.stocksService.delete(data, username);
+    return this.stocksService.delete(data);
   }
 
   @Put()

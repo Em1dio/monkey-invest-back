@@ -94,7 +94,7 @@ export class CryptocoinsService {
       .lean();
     if (!result) {
       throw new HttpException(
-        'User doenst have this Crypto',
+        'User doesnt have this Crypto',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -110,7 +110,7 @@ export class CryptocoinsService {
     const wallet = await this.walletsService.validateWallet(walletId, username);
     if (!wallet) {
       throw new HttpException(
-        'User doenst have access to this wallet',
+        'User doesnt have access to this wallet',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -162,7 +162,7 @@ export class CryptocoinsService {
       return response.data.coins;
     } catch (error) {
       throw new HttpException(
-        'brapi doenst recognize this crypto',
+        'brapi doesnt recognize this crypto',
         HttpStatus.EXPECTATION_FAILED,
       );
     }
